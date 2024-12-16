@@ -1,27 +1,31 @@
 package com.makotto.calculaFrete.services;
 
 import com.makotto.calculaFrete.entities.Order;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
+import com.makotto.calculaFrete.formatter.CurrencyFormatter;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ShippingService {
 
-    //shippiment(order: Order): double
-
-    public void shippiment(Order order) {
-
-        Double basic = order.getBasic();
+    public double shippiment(Double basic) {
 
         if (basic < 100.00) {
-            order.setBasic(basic + 20.00);
+            return 20.00;
         } else if (basic >= 100.00 && basic <= 200.00) {
-            order.setBasic(basic + 12.00);
+            return 12.00;
         } else {
-            order.setBasic(basic);
+            return 0.00; // Frete grátis para pedidos acima de 200.00
         }
+    }
 
+    public String getFormattedShippingCost(Double basic) {
+        double shippingCost = shippiment(basic);
+        return CurrencyFormatter.format(shippingCost);
+    }
+
+    public void applyShipping(Order order) {
+        double shippingCost = shippiment(order.getBasic());
+        order.setBasic(order.getBasic() + shippingCost);
     }
 
 }
